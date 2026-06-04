@@ -1,0 +1,984 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>战术雷达训练器 / Tactical Radar Trainer</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #282b37;
+      --panel: rgba(28, 31, 42, 0.82);
+      --line: rgba(255,255,255,0.12);
+      --text: #f7f7fb;
+      --muted: #a9adbb;
+      --blue: #79a9ff;
+      --gold: #ffc23d;
+      --green: #22e044;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .phone {
+      position: relative;
+      width: min(100vw, 620px);
+      min-height: 100vh;
+      margin: 0 auto;
+      overflow: hidden;
+      background: #282b37;
+    }
+
+    .topbar {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      z-index: 5;
+      width: min(100vw, 620px);
+      transform: translateX(-50%);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 0 28px;
+      pointer-events: none;
+    }
+
+    .clock {
+      font-size: 24px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 188px;
+      justify-content: center;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: #050506;
+      box-shadow: 0 10px 24px rgba(0,0,0,.25);
+      font-weight: 900;
+    }
+
+    .pill i {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #18d982;
+      box-shadow: 0 0 0 7px rgba(24,217,130,.16);
+    }
+
+    .battery {
+      justify-self: end;
+      min-width: 36px;
+      padding: 2px 8px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.82);
+      color: #282b37;
+      font-size: 17px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .actions {
+      position: fixed;
+      z-index: 7;
+      top: 112px;
+      right: max(22px, calc((100vw - 620px) / 2 + 22px));
+      display: flex;
+      gap: 16px;
+    }
+
+    .icon-button {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: white;
+      font-size: 28px;
+      cursor: pointer;
+    }
+
+    .radar-stage {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 160px 18px 170px;
+    }
+
+    canvas {
+      display: block;
+      width: min(92vw, 560px);
+      max-width: 100%;
+      aspect-ratio: 1;
+      touch-action: none;
+    }
+
+    .hud {
+      position: fixed;
+      top: 82px;
+      left: 50%;
+      z-index: 4;
+      width: min(92vw, 560px);
+      transform: translateX(-50%);
+      display: grid;
+      gap: 8px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+    }
+
+    .scoreline,
+    .alive-line {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .scoreline strong {
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .scoreline strong:last-child,
+    .alive-line span:last-child {
+      text-align: right;
+    }
+
+    .scoreline span,
+    .alive-line span,
+    .objective small,
+    .hint,
+    .play-panel span {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .objective {
+      display: grid;
+      grid-template-columns: 88px 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    #objectiveSite {
+      display: block;
+      font-size: 17px;
+      font-weight: 900;
+    }
+
+    progress {
+      width: 100%;
+      height: 10px;
+      border: 0;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #11131a;
+    }
+
+    progress::-webkit-progress-bar { background: #11131a; }
+    progress::-webkit-progress-value { background: linear-gradient(90deg, var(--blue), var(--gold)); }
+    progress::-moz-progress-bar { background: linear-gradient(90deg, var(--blue), var(--gold)); }
+
+    .game-controls {
+      position: fixed;
+      left: 50%;
+      bottom: 124px;
+      z-index: 5;
+      width: min(54vw, 340px);
+      transform: translateX(-50%);
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.2fr;
+      gap: 8px;
+    }
+
+    button,
+    select {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(17, 19, 26, .88);
+      color: white;
+      font: inherit;
+      font-weight: 850;
+    }
+
+    select { padding: 0 8px; }
+    button { cursor: pointer; }
+
+    .play-panel {
+      position: fixed;
+      left: max(18px, calc((100vw - 620px) / 2 + 18px));
+      bottom: 118px;
+      z-index: 5;
+      display: grid;
+      gap: 6px;
+      width: min(35vw, 184px);
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(22,24,32,.84);
+      backdrop-filter: blur(10px);
+    }
+
+    .play-panel label {
+      display: grid;
+      gap: 4px;
+    }
+
+    .play-panel select {
+      min-height: 34px;
+      font-size: 13px;
+    }
+
+    .dpad {
+      position: fixed;
+      right: max(18px, calc((100vw - 620px) / 2 + 18px));
+      bottom: 112px;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: repeat(3, 44px);
+      grid-template-rows: repeat(3, 38px);
+      gap: 4px;
+    }
+
+    .dpad button {
+      border-radius: 8px;
+      font-size: 18px;
+      touch-action: none;
+    }
+
+    .dpad [data-dir="up"] { grid-column: 2; grid-row: 1; }
+    .dpad [data-dir="left"] { grid-column: 1; grid-row: 2; }
+    .dpad [data-dir="down"] { grid-column: 2; grid-row: 3; }
+    .dpad [data-dir="right"] { grid-column: 3; grid-row: 2; }
+
+    .readout {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      z-index: 4;
+      width: min(92vw, 560px);
+      transform: translateX(-50%);
+      display: grid;
+      gap: 7px;
+      pointer-events: none;
+    }
+
+    .readout-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 24px;
+      color: white;
+      font-size: clamp(16px, 4.7vw, 24px);
+      line-height: 1.05;
+      text-shadow: 0 2px 3px rgba(0,0,0,.8);
+      white-space: nowrap;
+    }
+
+    .readout-row i {
+      width: 17px;
+      height: 17px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+    }
+
+    .hp {
+      color: var(--green);
+      font-weight: 850;
+    }
+
+    .event-log {
+      position: fixed;
+      right: max(18px, calc((100vw - 620px) / 2 + 18px));
+      top: 178px;
+      z-index: 4;
+      display: grid;
+      gap: 5px;
+      width: min(50vw, 240px);
+      pointer-events: none;
+    }
+
+    .event-item {
+      overflow: hidden;
+      padding: 6px 8px;
+      border-radius: 6px;
+      background: rgba(13,15,21,.62);
+      color: rgba(255,255,255,.9);
+      font-size: 12px;
+      font-weight: 750;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .sheet {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: grid;
+      place-items: center;
+      padding: 92px 22px 90px;
+      background: rgba(40,43,55,.42);
+    }
+
+    .sheet.hidden { display: none; }
+
+    .sheet-card {
+      width: min(100%, 455px);
+      display: grid;
+      gap: 16px;
+      padding: 28px;
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 18px;
+      background: rgba(31,33,44,.97);
+      box-shadow: 0 30px 70px rgba(0,0,0,.32);
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field span {
+      color: white;
+      font-weight: 900;
+    }
+
+    @media (max-width: 430px) {
+      .topbar { padding: 0 16px; }
+      .clock { font-size: 21px; }
+      .pill { min-width: 136px; font-size: 14px; }
+      .game-controls { width: min(48vw, 260px); grid-template-columns: 1fr; bottom: 112px; }
+      .play-panel { width: 155px; bottom: 112px; }
+      .dpad { grid-template-columns: repeat(3, 40px); grid-template-rows: repeat(3, 36px); }
+    }
+  </style>
+</head>
+<body>
+  <main class="phone">
+    <header class="topbar">
+      <div class="clock" id="clock">00:00</div>
+      <div class="pill"><i></i><strong>已连接 / Connected</strong></div>
+      <div class="battery">27</div>
+    </header>
+
+    <div class="actions">
+      <button id="serverButton" class="icon-button" type="button" aria-label="雷达服务器">▤</button>
+      <button id="settingsButton" class="icon-button" type="button" aria-label="设置">⚙</button>
+    </div>
+
+    <section class="radar-stage" aria-label="雷达">
+      <canvas id="radar" width="1000" height="1000"></canvas>
+    </section>
+
+    <section class="hud" aria-label="训练状态">
+      <div class="scoreline">
+        <strong id="alphaScore">0</strong>
+        <span id="roundLabel">第1回合 / R1</span>
+        <strong id="bravoScore">0</strong>
+      </div>
+      <div class="objective">
+        <div>
+          <span id="objectiveSite">A 点 / Site A</span>
+          <small id="timeLeft">105.0s</small>
+        </div>
+        <progress id="objectiveProgress" value="0" max="100"></progress>
+      </div>
+      <div class="alive-line">
+        <span id="alphaAlive">防守方 / Alpha 5</span>
+        <span id="phaseLabel">进行中 / LIVE</span>
+        <span id="bravoAlive">进攻方 / Bravo 5</span>
+      </div>
+    </section>
+
+    <section class="game-controls" aria-label="训练控制">
+      <button id="pauseGame" type="button">暂停 / Pause</button>
+      <button id="nextRound" type="button">下一回合 / Next</button>
+      <select id="difficulty">
+        <option value="easy">简单 / Easy</option>
+        <option value="normal" selected>普通 / Normal</option>
+        <option value="hard">困难 / Hard</option>
+      </select>
+    </section>
+
+    <section class="play-panel" aria-label="玩家控制">
+      <label>
+        <span>控制 / Control</span>
+        <select id="controlPlayer"></select>
+      </label>
+      <div class="hint">移动 / Move: WASD / Arrow keys</div>
+    </section>
+
+    <section class="dpad" aria-label="移动控制">
+      <button data-dir="up" type="button">▲</button>
+      <button data-dir="left" type="button">◀</button>
+      <button data-dir="down" type="button">▼</button>
+      <button data-dir="right" type="button">▶</button>
+    </section>
+
+    <section class="readout" id="readout" aria-label="观战列表"></section>
+    <section class="event-log" id="eventLog" aria-label="事件记录"></section>
+
+    <div class="sheet hidden" id="settingsSheet" role="dialog" aria-label="设置">
+      <div class="sheet-card">
+        <label class="field">
+          <span>地图 / Map</span>
+          <select id="mapChoice">
+            <option value="auto" selected>自动识别 / Auto</option>
+            <option value="training">训练图 / Training</option>
+            <option value="compact">紧凑图 / Compact</option>
+            <option value="long">长廊图 / Long</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>显示 / Display</span>
+          <select id="displayMode">
+            <option value="full">完整 / Full</option>
+            <option value="clean">简洁 / Clean</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div class="sheet hidden" id="serverSheet" role="dialog" aria-label="雷达服务器">
+      <div class="sheet-card">
+        <h2>雷达服务器 / Radar Server</h2>
+        <label class="field">
+          <span>线路 / Region</span>
+          <select id="region">
+            <option value="shanghai">上海 / Shanghai</option>
+            <option value="beijing">北京 / Beijing</option>
+            <option value="guangzhou">广州 / Guangzhou</option>
+            <option value="chengdu">成都 / Chengdu</option>
+            <option value="hongkong">香港 / Hong Kong</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const canvas = document.getElementById('radar');
+    const ctx = canvas.getContext('2d');
+    const clock = document.getElementById('clock');
+    const alphaScore = document.getElementById('alphaScore');
+    const bravoScore = document.getElementById('bravoScore');
+    const roundLabel = document.getElementById('roundLabel');
+    const objectiveSite = document.getElementById('objectiveSite');
+    const objectiveProgress = document.getElementById('objectiveProgress');
+    const timeLeft = document.getElementById('timeLeft');
+    const alphaAlive = document.getElementById('alphaAlive');
+    const bravoAlive = document.getElementById('bravoAlive');
+    const phaseLabel = document.getElementById('phaseLabel');
+    const pauseGame = document.getElementById('pauseGame');
+    const nextRound = document.getElementById('nextRound');
+    const difficulty = document.getElementById('difficulty');
+    const controlPlayer = document.getElementById('controlPlayer');
+    const readout = document.getElementById('readout');
+    const eventLog = document.getElementById('eventLog');
+    const settingsButton = document.getElementById('settingsButton');
+    const serverButton = document.getElementById('serverButton');
+    const settingsSheet = document.getElementById('settingsSheet');
+    const serverSheet = document.getElementById('serverSheet');
+    const mapChoice = document.getElementById('mapChoice');
+    const displayMode = document.getElementById('displayMode');
+
+    const COLORS = ['#f43f5e', '#22c55e', '#3b82f6', '#f59e0b', '#a855f7'];
+    const COLOR_NAMES = ['红色', '绿色', '蓝色', '橙色', '紫色'];
+    const mapLayouts = {
+      training: {
+        sites: [[190,338,86,82,'B'], [675,690,82,76,'A']],
+        zones: [[755,385,100,110], [145,620,112,95]],
+        cover: [[170,340,38,30], [520,300,70,18], [785,390,75,20], [238,662,75,28], [470,638,95,22], [700,720,54,34], [390,850,90,22], [585,735,30,85]],
+        polys: [
+          [[80,300],[230,280],[360,305],[365,420],[310,430],[300,510],[190,515],[180,470],[80,470]],
+          [[350,270],[610,270],[610,370],[540,370],[535,455],[390,455],[390,370],[350,370]],
+          [[630,315],[890,330],[930,470],[850,520],[760,505],[735,415],[630,410]],
+          [[120,540],[330,535],[380,670],[330,790],[150,780],[90,675]],
+          [[430,525],[610,520],[650,650],[590,800],[430,790],[395,650]],
+          [[675,555],[900,560],[930,770],[760,810],[650,720]],
+          [[315,805],[620,805],[650,925],[290,930]]
+        ]
+      },
+      compact: {
+        sites: [[205,245,92,92,'B'], [695,660,92,92,'A']],
+        zones: [[410,390,170,190], [205,650,150,95]],
+        cover: [[235,390,120,20], [385,285,45,120], [585,435,160,24], [305,605,40,110], [645,755,145,22]],
+        polys: [
+          [[135,185],[385,180],[430,310],[340,390],[145,385]],
+          [[395,250],[610,250],[610,405],[555,460],[420,455]],
+          [[615,320],[880,350],[870,560],[705,560],[650,460]],
+          [[165,455],[385,470],[420,655],[335,785],[145,720]],
+          [[425,515],[650,510],[690,685],[610,820],[430,795]],
+          [[665,600],[875,610],[905,815],[705,840]]
+        ]
+      },
+      long: {
+        sites: [[130,325,84,84,'B'], [780,575,84,84,'A']],
+        zones: [[555,325,165,90], [250,675,150,105]],
+        cover: [[270,350,210,20], [500,410,35,180], [605,585,150,24], [350,760,260,20], [795,455,26,95]],
+        polys: [
+          [[70,280],[245,270],[250,445],[95,480]],
+          [[245,325],[515,320],[540,430],[260,470]],
+          [[515,345],[765,350],[825,470],[760,555],[550,515]],
+          [[725,500],[930,520],[940,710],[790,760],[700,640]],
+          [[170,545],[390,560],[435,710],[345,870],[130,810]],
+          [[395,645],[705,650],[735,795],[610,900],[395,865]]
+        ]
+      }
+    };
+
+    let state = createGame();
+    let mapCache;
+    let cachedMap = '';
+    let lastFrame = 0;
+    let inputState = {up:false, down:false, left:false, right:false};
+
+    function createGame(resetScore = true) {
+      const map = mapChoice?.value && mapChoice.value !== 'auto' ? mapChoice.value : 'training';
+      const site = Math.random() > 0.5 ? 'A' : 'B';
+      const players = [];
+      const spawn = {
+        training: {alpha:[220,730], bravo:[810,290]},
+        compact: {alpha:[225,700], bravo:[815,320]},
+        long: {alpha:[180,760], bravo:[870,330]}
+      }[map] || {alpha:[220,730], bravo:[810,290]};
+
+      for (const team of ['alpha', 'bravo']) {
+        const [baseX, baseY] = spawn[team];
+        for (let i = 0; i < 5; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          players.push({
+            pid: players.length + 1,
+            team,
+            color: COLORS[i],
+            colorName: COLOR_NAMES[i],
+            weapon: ['pistol','rifle','knife','awp','smg'][(i + (team === 'alpha' ? 0 : 2)) % 5],
+            hp: 100,
+            x: baseX + rand(-70,70),
+            y: baseY + (i - 2) * 46 + rand(-18,18),
+            vx: Math.cos(angle) * rand(36,76),
+            vy: Math.sin(angle) * rand(36,76),
+            heading: angle,
+            alive: true,
+            controlled: players.length === 0
+          });
+        }
+      }
+
+      return {
+        map,
+        round: resetScore ? 1 : state.round + 1,
+        score: resetScore ? {alpha:0, bravo:0} : {...state.score},
+        site,
+        progress: 0,
+        startedAt: performance.now(),
+        phase: 'live',
+        paused: false,
+        winner: '',
+        difficulty: difficulty?.value || 'normal',
+        controlledPid: 1,
+        players,
+        events: [`第 ${resetScore ? 1 : state.round + 1} 回合 / Round ${resetScore ? 1 : state.round + 1}: 进攻方攻击 ${site} 点 / Attack site ${site}`]
+      };
+    }
+
+    function rand(min, max) { return min + Math.random() * (max - min); }
+    function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
+    function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+    function teamLabel(team) { return team === 'alpha' ? '防守方 / Alpha' : '进攻方 / Bravo'; }
+
+    function pushEvent(message) {
+      state.events.unshift(message);
+      state.events = state.events.slice(0, 8);
+    }
+
+    function nextGameRound(resetScore = false) {
+      state = createGame(resetScore);
+      mapCache = null;
+      updateControls();
+    }
+
+    function updateGame(dt) {
+      if (state.paused || state.phase !== 'live') {
+        if (state.phase === 'ended' && performance.now() - state.endedAt > 4000) nextGameRound(false);
+        return;
+      }
+
+      const diff = {easy:{aim:.55,speed:.84}, normal:{aim:.78,speed:1}, hard:{aim:1.05,speed:1.14}}[state.difficulty] || {aim:.78,speed:1};
+      const sites = siteCenters();
+      const targetSite = sites[state.site];
+      const human = state.players.find(p => p.pid === state.controlledPid);
+      const input = inputVector();
+
+      for (const [index, player] of state.players.entries()) {
+        if (!player.alive) {
+          player.vx = 0;
+          player.vy = 0;
+          continue;
+        }
+
+        if (player === human) {
+          const mag = Math.hypot(input.x, input.y);
+          if (mag > .05) {
+            player.vx = player.vx * .35 + input.x * 112 * .65;
+            player.vy = player.vy * .35 + input.y * 112 * .65;
+          } else {
+            player.vx *= .82;
+            player.vy *= .82;
+          }
+        } else {
+          let tx;
+          let ty;
+          if (player.team === 'bravo') {
+            tx = targetSite.x + (index - 7) * 18;
+            ty = targetSite.y + Math.sin((performance.now() / 40 + index * 13) / 80) * 80;
+          } else {
+            const values = Object.values(sites);
+            const site = values[index % values.length];
+            tx = site.x + Math.sin((performance.now() / 40 + index * 31) / 110) * 140;
+            ty = site.y + Math.cos((performance.now() / 40 + index * 29) / 90) * 95;
+          }
+          const dx = tx - player.x;
+          const dy = ty - player.y;
+          const d = Math.max(1, Math.hypot(dx, dy));
+          const speed = (player.team === 'alpha' ? 58 : 68) * diff.speed;
+          player.vx = player.vx * .88 + dx / d * speed * .12;
+          player.vy = player.vy * .88 + dy / d * speed * .12;
+        }
+
+        player.x = clamp(player.x + player.vx * dt, 45, 955);
+        player.y = clamp(player.y + player.vy * dt, 45, 955);
+        player.heading = Math.atan2(player.vy, player.vx);
+      }
+
+      simulateCombat(dt, diff);
+      updateObjective(dt);
+    }
+
+    function simulateCombat(dt, diff) {
+      for (const attacker of state.players.filter(p => p.alive)) {
+        const enemies = state.players.filter(p => p.alive && p.team !== attacker.team && dist(attacker, p) < 135);
+        if (!enemies.length) continue;
+        const target = enemies.sort((a, b) => dist(attacker, a) - dist(attacker, b))[0];
+        const d = dist(attacker, target);
+        let chance = (0.18 + (135 - d) / 135 * 0.52) * diff.aim * dt;
+        if (attacker.weapon === 'awp') chance *= 1.28;
+        if (attacker.weapon === 'knife') chance *= .35;
+        if (Math.random() < chance) {
+          let damage = Math.floor(rand(7, 18));
+          if (attacker.weapon === 'awp') damage += Math.floor(rand(8, 18));
+          target.hp = Math.max(0, target.hp - damage);
+          if (target.hp === 0) {
+            target.alive = false;
+            pushEvent(`${teamLabel(attacker.team)} ${attacker.colorName} 淘汰 / eliminated ${teamLabel(target.team)} ${target.colorName}`);
+          }
+        }
+      }
+    }
+
+    function updateObjective(dt) {
+      const alpha = state.players.filter(p => p.team === 'alpha' && p.alive);
+      const bravo = state.players.filter(p => p.team === 'bravo' && p.alive);
+      if (!alpha.length) return endRound('bravo', '进攻方清除防守 / Attackers cleared defenders');
+      if (!bravo.length) return endRound('alpha', '防守方阻止进攻 / Defenders stopped attack');
+      const elapsed = (performance.now() - state.startedAt) / 1000;
+      if (elapsed > 105) return endRound('alpha', '时间结束 / Time expired');
+
+      const site = siteCenters()[state.site];
+      const attackers = bravo.filter(p => Math.hypot(p.x - site.x, p.y - site.y) < 115).length;
+      const defenders = alpha.filter(p => Math.hypot(p.x - site.x, p.y - site.y) < 135).length;
+      state.progress = clamp(state.progress + (attackers * 7.5 - defenders * 5) * dt, 0, 100);
+      if (state.progress >= 100) endRound('bravo', `进攻方占领 ${state.site} 点 / Attackers secured site ${state.site}`);
+    }
+
+    function endRound(winner, reason) {
+      if (state.phase !== 'live') return;
+      state.phase = 'ended';
+      state.winner = winner;
+      state.score[winner] += 1;
+      state.endedAt = performance.now();
+      pushEvent(reason);
+    }
+
+    function siteCenters() {
+      const out = {};
+      for (const [x, y, w, h, label] of mapLayouts[state.map].sites) out[label] = {x:x+w/2, y:y+h/2};
+      return out;
+    }
+
+    function buildMapCache() {
+      const layout = mapLayouts[state.map];
+      const cache = document.createElement('canvas');
+      cache.width = 1000;
+      cache.height = 1000;
+      const c = cache.getContext('2d');
+
+      c.fillStyle = 'rgba(50,58,70,.9)';
+      c.strokeStyle = 'rgba(118,133,151,.26)';
+      c.lineWidth = 4;
+      for (const points of layout.polys) {
+        c.beginPath();
+        points.forEach(([x,y], i) => i ? c.lineTo(x,y) : c.moveTo(x,y));
+        c.closePath();
+        c.fill();
+        c.stroke();
+      }
+
+      c.fillStyle = 'rgba(25,29,38,.72)';
+      layout.cover.forEach(([x,y,w,h]) => c.fillRect(x,y,w,h));
+      c.fillStyle = 'rgba(111,151,210,.5)';
+      layout.zones.forEach(([x,y,w,h]) => c.fillRect(x,y,w,h));
+      c.fillStyle = 'rgba(215,67,80,.68)';
+      layout.sites.forEach(([x,y,w,h]) => c.fillRect(x,y,w,h));
+      c.fillStyle = 'rgba(255,255,255,.88)';
+      c.font = '700 34px system-ui, sans-serif';
+      layout.sites.forEach(([x,y,,,label]) => c.fillText(label, x+30, y+54));
+
+      mapCache = cache;
+      cachedMap = state.map;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, 1000, 1000);
+      ctx.fillStyle = '#282b37';
+      ctx.fillRect(0, 0, 1000, 1000);
+      if (!mapCache || cachedMap !== state.map) buildMapCache();
+      ctx.drawImage(mapCache, 0, 0);
+      drawObjective();
+      drawPlayers();
+      if (displayMode.value === 'full') drawLabels();
+    }
+
+    function drawObjective() {
+      const layout = mapLayouts[state.map];
+      const site = layout.sites.find(item => item[4] === state.site);
+      if (!site) return;
+      const [x,y,w,h] = site;
+      const pulse = .5 + Math.sin(performance.now()/180) * .5;
+      ctx.strokeStyle = `rgba(255,212,55,${.38 + pulse * .34})`;
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.arc(x+w/2, y+h/2, 72 + pulse * 18, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(255,212,55,.12)';
+      ctx.beginPath();
+      ctx.arc(x+w/2, y+h/2, 82, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    function drawPlayers() {
+      const size = 18;
+      for (const player of state.players) {
+        if (player.alive) drawCone(player, size);
+        ctx.save();
+        ctx.translate(player.x, player.y);
+        ctx.rotate(player.heading);
+        ctx.globalAlpha = player.alive ? 1 : .32;
+        ctx.fillStyle = player.alive ? player.color : '#7c8294';
+        ctx.strokeStyle = player.alive ? 'rgba(255,255,255,.72)' : 'rgba(255,255,255,.28)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(0, 0, size, 0, Math.PI*2);
+        ctx.fill();
+        ctx.stroke();
+        if (player.controlled) {
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          ctx.arc(0, 0, size+9, 0, Math.PI*2);
+          ctx.stroke();
+        }
+        if (!player.alive) {
+          ctx.strokeStyle = 'rgba(255,255,255,.75)';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.moveTo(-size*.72, -size*.72);
+          ctx.lineTo(size*.72, size*.72);
+          ctx.moveTo(size*.72, -size*.72);
+          ctx.lineTo(-size*.72, size*.72);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+    }
+
+    function drawCone(player, size) {
+      ctx.save();
+      ctx.translate(player.x, player.y);
+      ctx.rotate(player.heading);
+      ctx.fillStyle = player.team === 'alpha' ? 'rgba(80,145,255,.22)' : 'rgba(255,212,55,.28)';
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, size * 6.2, -.42, .42);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawLabels() {
+      ctx.font = '800 22px system-ui, sans-serif';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(0,0,0,.85)';
+      ctx.shadowBlur = 4;
+      ctx.shadowOffsetY = 2;
+      for (const player of state.players) {
+        if (!player.alive) continue;
+        const team = player.team === 'alpha' ? '防守' : '进攻';
+        ctx.fillStyle = '#fff';
+        ctx.fillText(`${team} ${player.colorName}`, player.x + 28, player.y + 2);
+        ctx.fillStyle = '#21e037';
+        ctx.fillText(`HP:[${player.hp}]`, player.x + 126, player.y + 2);
+      }
+      ctx.shadowBlur = 0;
+    }
+
+    function updateHud() {
+      const aliveA = state.players.filter(p => p.team === 'alpha' && p.alive).length;
+      const aliveB = state.players.filter(p => p.team === 'bravo' && p.alive).length;
+      const elapsed = (performance.now() - state.startedAt) / 1000;
+      alphaScore.textContent = state.score.alpha;
+      bravoScore.textContent = state.score.bravo;
+      roundLabel.textContent = `第${state.round}回合 / R${state.round}`;
+      objectiveSite.textContent = `${state.site} 点 / Site ${state.site}`;
+      objectiveProgress.value = state.progress;
+      timeLeft.textContent = `${Math.max(0, 105 - elapsed).toFixed(1)}s`;
+      alphaAlive.textContent = `防守方 / Alpha ${aliveA}`;
+      bravoAlive.textContent = `进攻方 / Bravo ${aliveB}`;
+      phaseLabel.textContent = state.paused ? '暂停 / PAUSED' : (state.phase === 'live' ? '进行中 / LIVE' : '结束 / ENDED');
+      pauseGame.textContent = state.paused ? '继续 / Resume' : '暂停 / Pause';
+      readout.innerHTML = state.players.slice(0, 5).map(player => {
+        const team = player.team === 'alpha' ? '防守' : '进攻';
+        return `<div class="readout-row"><i style="background:${player.color}"></i><span>${team} ${player.colorName}</span><span class="hp">HP:[${player.hp}]</span></div>`;
+      }).join('');
+      eventLog.innerHTML = state.events.slice(0,4).map(event => `<div class="event-item">${escapeHtml(event)}</div>`).join('');
+    }
+
+    function updateControls() {
+      const options = state.players.map(player => {
+        const team = player.team === 'alpha' ? '防守方 / Alpha' : '进攻方 / Bravo';
+        return `<option value="${player.pid}">${team} ${player.colorName}</option>`;
+      }).join('');
+      controlPlayer.innerHTML = options;
+      controlPlayer.value = String(state.controlledPid);
+    }
+
+    function escapeHtml(value) {
+      return String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;");
+    }
+
+    function inputVector() {
+      let x = 0;
+      let y = 0;
+      if (inputState.left) x -= 1;
+      if (inputState.right) x += 1;
+      if (inputState.up) y -= 1;
+      if (inputState.down) y += 1;
+      if (x && y) {
+        x *= Math.SQRT1_2;
+        y *= Math.SQRT1_2;
+      }
+      return {x, y};
+    }
+
+    function setInput(name, value) {
+      inputState[name] = value;
+    }
+
+    function frame(timestamp) {
+      const dt = Math.min(.05, lastFrame ? (timestamp - lastFrame) / 1000 : 0);
+      lastFrame = timestamp;
+      updateGame(dt);
+      draw();
+      updateHud();
+      requestAnimationFrame(frame);
+    }
+
+    function updateClock() {
+      const now = new Date();
+      clock.textContent = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    }
+
+    pauseGame.addEventListener('click', () => state.paused = !state.paused);
+    nextRound.addEventListener('click', () => nextGameRound(false));
+    difficulty.addEventListener('change', () => {
+      state.difficulty = difficulty.value;
+      pushEvent(`难度已设置 / Difficulty: ${difficulty.options[difficulty.selectedIndex].textContent}`);
+    });
+    controlPlayer.addEventListener('change', () => {
+      state.controlledPid = Number(controlPlayer.value);
+      state.players.forEach(p => p.controlled = p.pid === state.controlledPid);
+      pushEvent(`正在控制玩家 / Controlling player ${state.controlledPid}`);
+    });
+    mapChoice.addEventListener('change', () => {
+      if (mapChoice.value !== 'auto') {
+        state.map = mapChoice.value;
+        nextGameRound(false);
+      }
+    });
+    settingsButton.addEventListener('click', () => settingsSheet.classList.toggle('hidden'));
+    serverButton.addEventListener('click', () => serverSheet.classList.toggle('hidden'));
+    settingsSheet.addEventListener('click', event => {
+      if (event.target === settingsSheet) settingsSheet.classList.add('hidden');
+    });
+    serverSheet.addEventListener('click', event => {
+      if (event.target === serverSheet) serverSheet.classList.add('hidden');
+    });
+
+    const keyMap = {
+      ArrowUp: 'up', w: 'up', W: 'up',
+      ArrowDown: 'down', s: 'down', S: 'down',
+      ArrowLeft: 'left', a: 'left', A: 'left',
+      ArrowRight: 'right', d: 'right', D: 'right'
+    };
+    window.addEventListener('keydown', event => {
+      const dir = keyMap[event.key];
+      if (!dir) return;
+      event.preventDefault();
+      setInput(dir, true);
+    });
+    window.addEventListener('keyup', event => {
+      const dir = keyMap[event.key];
+      if (!dir) return;
+      event.preventDefault();
+      setInput(dir, false);
+    });
+    document.querySelectorAll('.dpad button').forEach(button => {
+      const dir = button.dataset.dir;
+      button.addEventListener('pointerdown', event => {
+        event.preventDefault();
+        button.setPointerCapture(event.pointerId);
+        setInput(dir, true);
+      });
+      button.addEventListener('pointerup', () => setInput(dir, false));
+      button.addEventListener('pointercancel', () => setInput(dir, false));
+      button.addEventListener('lostpointercapture', () => setInput(dir, false));
+    });
+
+    updateControls();
+    updateClock();
+    setInterval(updateClock, 1000);
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>

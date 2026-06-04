@@ -1,0 +1,10 @@
+.vercel
+__pycache__/
+*.pyc
+
+# Local reference media from the build conversation
+Pasted image*.png
+*.mp4
+
+# OS/editor noise
+.DS_Store

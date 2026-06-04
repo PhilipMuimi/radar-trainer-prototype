@@ -1,0 +1,34 @@
+{
+  "mode": "authorized",
+  "map": "compact",
+  "players": [
+    {
+      "pid": 1,
+      "team": "alpha",
+      "color": "#3b82f6",
+      "color_name": "蓝色",
+      "weapon": "rifle",
+      "hp": 100,
+      "x": 260,
+      "y": 420,
+      "vx": 40,
+      "vy": 0,
+      "heading": 0.0,
+      "alive": true
+    },
+    {
+      "pid": 2,
+      "team": "bravo",
+      "color": "#f59e0b",
+      "color_name": "橙色",
+      "weapon": "awp",
+      "hp": 87,
+      "x": 710,
+      "y": 610,
+      "vx": -20,
+      "vy": 15,
+      "heading": 2.4,
+      "alive": true
+    }
+  ]
+}

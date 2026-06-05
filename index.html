@@ -200,6 +200,7 @@
     progress::-moz-progress-bar { background: linear-gradient(90deg, var(--blue), var(--gold)); }
 
     .game-controls {
+      display: none;
       position: fixed;
       left: 50%;
       bottom: 124px;
@@ -226,6 +227,7 @@
     button { cursor: pointer; }
 
     .play-panel {
+      display: none;
       position: fixed;
       left: max(18px, calc((100vw - 620px) / 2 + 18px));
       bottom: 118px;
@@ -251,6 +253,7 @@
     }
 
     .dpad {
+      display: none;
       position: fixed;
       right: max(18px, calc((100vw - 620px) / 2 + 18px));
       bottom: 112px;
@@ -392,7 +395,7 @@
       }
 
       .radar-stage {
-        padding: 128px 360px 150px 280px;
+        padding: 128px 300px 118px 300px;
       }
 
       canvas {
@@ -417,33 +420,8 @@
         line-height: 1.25;
       }
 
-      .play-panel {
-        left: calc(50vw - 650px);
-        bottom: 154px;
-        width: 230px;
-        padding: 12px;
-      }
-
-      .play-panel select {
-        min-height: 40px;
-        font-size: 15px;
-      }
-
-      .game-controls {
-        left: calc(50vw - 145px);
-        bottom: 58px;
-        width: 330px;
-      }
-
-      .dpad {
-        right: calc(50vw - 650px);
-        bottom: 118px;
-        grid-template-columns: repeat(3, 54px);
-        grid-template-rows: repeat(3, 46px);
-      }
-
       .readout {
-        left: calc(50vw - 165px);
+        left: 50%;
         bottom: 18px;
         width: 560px;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -668,7 +646,7 @@
             vy: Math.sin(angle) * rand(36,76),
             heading: angle,
             alive: true,
-            controlled: players.length === 0
+            controlled: false
           });
         }
       }
@@ -684,7 +662,7 @@
         paused: false,
         winner: '',
         difficulty: difficulty?.value || 'normal',
-        controlledPid: 1,
+        controlledPid: 0,
         players,
         events: [`第 ${resetScore ? 1 : state.round + 1} 回合 / Round ${resetScore ? 1 : state.round + 1}: 进攻方攻击 ${site} 点 / Attack site ${site}`]
       };
@@ -715,7 +693,7 @@
       const diff = {easy:{aim:.55,speed:.84}, normal:{aim:.78,speed:1}, hard:{aim:1.05,speed:1.14}}[state.difficulty] || {aim:.78,speed:1};
       const sites = siteCenters();
       const targetSite = sites[state.site];
-      const human = state.players.find(p => p.pid === state.controlledPid);
+      const human = null;
       const input = inputVector();
 
       for (const [index, player] of state.players.entries()) {

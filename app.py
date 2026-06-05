@@ -91,7 +91,7 @@ class MatchState:
         self.objective_progress = 0.0
         self.winner = ""
         self.players: list[Player] = []
-        self.controlled_pid = 1
+        self.controlled_pid = 0
         self.input_x = 0.0
         self.input_y = 0.0
         self._start_round(reset_score=True)
@@ -114,12 +114,8 @@ class MatchState:
         self._push_event(f"第 {self.round_number} 回合 / Round {self.round_number}: 进攻方攻击 {self.objective_site} 点 / Attack site {self.objective_site}")
 
     def _assign_controlled_player(self) -> None:
-        if not self.players:
-            return
-        if not any(player.pid == self.controlled_pid for player in self.players):
-            self.controlled_pid = self.players[0].pid
         for player in self.players:
-            player.controlled = player.pid == self.controlled_pid
+            player.controlled = False
 
     def _spawn_players(self) -> list[Player]:
         players: list[Player] = []
@@ -169,7 +165,6 @@ class MatchState:
                 return
 
             self.tick += 1
-            self._update_controlled_player()
             self._update_bots()
             for player in self.players:
                 if not player.alive:
@@ -225,15 +220,12 @@ class MatchState:
                 self.map_detection = "manual"
                 self._start_round()
             elif action == "control":
-                pid = int(payload.get("pid", self.controlled_pid))
-                if not any(player.pid == pid for player in self.players):
-                    raise ValueError("unknown player")
-                self.controlled_pid = pid
+                self.controlled_pid = 0
                 self._assign_controlled_player()
-                self._push_event(f"正在控制玩家 / Controlling player {pid}")
+                self._push_event("自动运行模式 / Autonomous mode")
             elif action == "input":
-                self.input_x = max(-1.0, min(1.0, float(payload.get("x", 0))))
-                self.input_y = max(-1.0, min(1.0, float(payload.get("y", 0))))
+                self.input_x = 0.0
+                self.input_y = 0.0
             else:
                 raise ValueError("unknown action")
             return {"ok": True, "game": self._game_snapshot()}
@@ -260,8 +252,6 @@ class MatchState:
         target_site = sites[self.objective_site]
         diff = DIFFICULTY[self.difficulty]
         for index, player in enumerate(self.players):
-            if player.pid == self.controlled_pid:
-                continue
             if not player.alive:
                 continue
             if player.team == "bravo":
@@ -975,6 +965,7 @@ progress::-moz-progress-bar {
 }
 
 .game-controls {
+  display: none;
   position: fixed;
   left: 50%;
   bottom: 122px;
@@ -998,6 +989,7 @@ progress::-moz-progress-bar {
 }
 
 .play-panel {
+  display: none;
   position: fixed;
   left: max(18px, calc((100vw - 620px) / 2 + 18px));
   bottom: 118px;
@@ -1032,6 +1024,7 @@ progress::-moz-progress-bar {
 }
 
 .dpad {
+  display: none;
   position: fixed;
   right: max(18px, calc((100vw - 620px) / 2 + 18px));
   bottom: 112px;
@@ -1387,7 +1380,7 @@ input[type="range"] {
   .radar-stage {
     position: fixed;
     inset: 0;
-    padding: 128px 360px 150px 280px;
+    padding: 128px 300px 118px 300px;
     place-items: center;
   }
 
@@ -1413,33 +1406,8 @@ input[type="range"] {
     line-height: 1.25;
   }
 
-  .play-panel {
-    left: calc(50vw - 650px);
-    bottom: 154px;
-    width: 230px;
-    padding: 12px;
-  }
-
-  .play-panel select {
-    min-height: 40px;
-    font-size: 15px;
-  }
-
-  .game-controls {
-    left: calc(50vw - 145px);
-    bottom: 58px;
-    width: 330px;
-  }
-
-  .dpad {
-    right: calc(50vw - 650px);
-    bottom: 118px;
-    grid-template-columns: repeat(3, 54px);
-    grid-template-rows: repeat(3, 46px);
-  }
-
   .readout {
-    left: calc(50vw - 165px);
+    left: 50%;
     bottom: 18px;
     width: 560px;
     grid-template-columns: repeat(2, minmax(0, 1fr));

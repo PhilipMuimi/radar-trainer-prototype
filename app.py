@@ -1360,6 +1360,99 @@ input[type="range"] {
     padding: 22px;
   }
 }
+
+@media (min-width: 900px) {
+  body {
+    overflow: hidden;
+  }
+
+  .phone {
+    width: 100vw;
+    min-height: 100vh;
+    margin: 0;
+  }
+
+  .topbar {
+    top: 14px;
+    width: min(100vw, 1120px);
+    padding: 0 18px;
+  }
+
+  .actions {
+    top: 122px;
+    right: calc(50vw - 330px);
+    gap: 12px;
+  }
+
+  .radar-stage {
+    position: fixed;
+    inset: 0;
+    padding: 128px 360px 150px 280px;
+    place-items: center;
+  }
+
+  canvas {
+    width: min(58vw, 760px, calc(100vh - 210px));
+    max-width: none;
+  }
+
+  .game-hud {
+    top: 74px;
+    width: min(58vw, 560px);
+  }
+
+  .event-log {
+    top: 190px;
+    right: calc(50vw - 650px);
+    width: 250px;
+    max-width: 250px;
+  }
+
+  .event-item {
+    white-space: normal;
+    line-height: 1.25;
+  }
+
+  .play-panel {
+    left: calc(50vw - 650px);
+    bottom: 154px;
+    width: 230px;
+    padding: 12px;
+  }
+
+  .play-panel select {
+    min-height: 40px;
+    font-size: 15px;
+  }
+
+  .game-controls {
+    left: calc(50vw - 145px);
+    bottom: 58px;
+    width: 330px;
+  }
+
+  .dpad {
+    right: calc(50vw - 650px);
+    bottom: 118px;
+    grid-template-columns: repeat(3, 54px);
+    grid-template-rows: repeat(3, 46px);
+  }
+
+  .readout {
+    left: calc(50vw - 165px);
+    bottom: 18px;
+    width: 560px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    transform: translateX(-50%);
+  }
+
+  .readout-row {
+    min-width: 0;
+    font-size: 18px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
 """
 
 

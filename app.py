@@ -1050,6 +1050,12 @@ progress::-moz-progress-bar {
 .dpad [data-dir="down"] { grid-column: 2; grid-row: 3; }
 .dpad [data-dir="right"] { grid-column: 3; grid-row: 2; }
 
+.game-controls,
+.play-panel,
+.dpad {
+  display: none !important;
+}
+
 .readout {
   position: fixed;
   left: 50%;

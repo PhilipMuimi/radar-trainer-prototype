@@ -48,8 +48,7 @@ def replay_route(frames: list[dict], loop: bool) -> list[tuple[dict, dict]]:
         return [(frames[0], frames[0])]
     pairs = list(zip(frames, frames[1:]))
     if loop:
-        reversed_frames = list(reversed(frames))
-        pairs.extend(zip(reversed_frames, reversed_frames[1:]))
+        pairs.append((frames[-1], frames[0]))
     return pairs
 
 

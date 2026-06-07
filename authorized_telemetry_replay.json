@@ -5,37 +5,105 @@
     {
       "sequence": 1,
       "players": [
-        {"pid": 1, "team": "alpha", "color": "#3b82f6", "color_name": "蓝色", "weapon": "rifle", "hp": 100, "x": 260, "y": 420, "vx": 18, "vy": 5, "heading": 0.2, "alive": true},
-        {"pid": 2, "team": "alpha", "color": "#22c55e", "color_name": "绿色", "weapon": "smg", "hp": 100, "x": 310, "y": 455, "vx": 12, "vy": 10, "heading": 0.6, "alive": true},
-        {"pid": 3, "team": "bravo", "color": "#f43f5e", "color_name": "红色", "weapon": "rifle", "hp": 100, "x": 725, "y": 640, "vx": -20, "vy": -8, "heading": 3.5, "alive": true},
-        {"pid": 4, "team": "bravo", "color": "#f59e0b", "color_name": "橙色", "weapon": "awp", "hp": 87, "x": 760, "y": 600, "vx": -18, "vy": 12, "heading": 2.6, "alive": true}
+        {"pid": 1, "team": "alpha", "color": "#3b82f6", "color_name": "蓝色", "weapon": "rifle", "hp": 100, "x": 185, "y": 690, "vx": 50, "vy": -34, "heading": -0.6, "alive": true},
+        {"pid": 2, "team": "alpha", "color": "#22c55e", "color_name": "绿色", "weapon": "smg", "hp": 100, "x": 230, "y": 735, "vx": 42, "vy": -45, "heading": -0.82, "alive": true},
+        {"pid": 3, "team": "alpha", "color": "#a855f7", "color_name": "紫色", "weapon": "awp", "hp": 100, "x": 160, "y": 610, "vx": 55, "vy": -12, "heading": -0.22, "alive": true},
+        {"pid": 4, "team": "alpha", "color": "#f59e0b", "color_name": "橙色", "weapon": "rifle", "hp": 100, "x": 305, "y": 760, "vx": 38, "vy": -60, "heading": -1.0, "alive": true},
+        {"pid": 5, "team": "bravo", "color": "#f43f5e", "color_name": "红色", "weapon": "rifle", "hp": 100, "x": 820, "y": 350, "vx": -55, "vy": 20, "heading": 2.8, "alive": true},
+        {"pid": 6, "team": "bravo", "color": "#06b6d4", "color_name": "青色", "weapon": "smg", "hp": 100, "x": 860, "y": 520, "vx": -62, "vy": 10, "heading": 2.98, "alive": true},
+        {"pid": 7, "team": "bravo", "color": "#ef4444", "color_name": "玫红", "weapon": "awp", "hp": 100, "x": 760, "y": 610, "vx": -42, "vy": -36, "heading": -2.43, "alive": true},
+        {"pid": 8, "team": "bravo", "color": "#84cc16", "color_name": "黄绿", "weapon": "rifle", "hp": 100, "x": 790, "y": 265, "vx": -48, "vy": 45, "heading": 2.39, "alive": true}
       ]
     },
     {
       "sequence": 2,
       "players": [
-        {"pid": 1, "team": "alpha", "color": "#3b82f6", "color_name": "蓝色", "weapon": "rifle", "hp": 100, "x": 282, "y": 426, "vx": 18, "vy": 5, "heading": 0.2, "alive": true},
-        {"pid": 2, "team": "alpha", "color": "#22c55e", "color_name": "绿色", "weapon": "smg", "hp": 94, "x": 325, "y": 468, "vx": 12, "vy": 10, "heading": 0.6, "alive": true},
-        {"pid": 3, "team": "bravo", "color": "#f43f5e", "color_name": "红色", "weapon": "rifle", "hp": 100, "x": 700, "y": 628, "vx": -20, "vy": -8, "heading": 3.5, "alive": true},
-        {"pid": 4, "team": "bravo", "color": "#f59e0b", "color_name": "橙色", "weapon": "awp", "hp": 87, "x": 738, "y": 612, "vx": -18, "vy": 12, "heading": 2.6, "alive": true}
+        {"pid": 1, "team": "alpha", "color": "#3b82f6", "color_name": "蓝色", "weapon": "rifle", "hp": 100, "x": 285, "y": 570, "vx": 62, "vy": -38, "heading": -0.55, "alive": true},
+        {"pid": 2, "team": "alpha", "color": "#22c55e", "color_name": "绿色", "weapon": "smg", "hp": 100, "x": 335, "y": 635, "vx": 48, "vy": -52, "heading": -0.82, "alive": true},
+        {"pid": 3, "team": "alpha", "color": "#a855f7", "color_name": "紫色", "weapon": "awp", "hp": 100, "x": 290, "y": 500, "vx": 68, "vy": -28, "heading": -0.39, "alive": true},
+        {"pid": 4, "team": "alpha", "color": "#f59e0b", "color_name": "橙色", "weapon": "rifle", "hp": 100, "x": 405, "y": 690, "vx": 52, "vy": -44, "heading": -0.7, "alive": true},
+        {"pid": 5, "team": "bravo", "color": "#f43f5e", "color_name": "红色", "weapon": "rifle", "hp": 96, "x": 700, "y": 405, "vx": -70, "vy": 22, "heading": 2.84, "alive": true},
+        {"pid": 6, "team": "bravo", "color": "#06b6d4", "color_name": "青色", "weapon": "smg", "hp": 100, "x": 730, "y": 555, "vx": -70, "vy": 14, "heading": 2.94, "alive": true},
+        {"pid": 7, "team": "bravo", "color": "#ef4444", "color_name": "玫红", "weapon": "awp", "hp": 100, "x": 680, "y": 535, "vx": -52, "vy": -42, "heading": -2.46, "alive": true},
+        {"pid": 8, "team": "bravo", "color": "#84cc16", "color_name": "黄绿", "weapon": "rifle", "hp": 100, "x": 680, "y": 340, "vx": -58, "vy": 45, "heading": 2.48, "alive": true}
       ]
     },
     {
       "sequence": 3,
       "players": [
-        {"pid": 1, "team": "alpha", "color": "#3b82f6", "color_name": "蓝色", "weapon": "rifle", "hp": 62, "x": 303, "y": 432, "vx": 18, "vy": 5, "heading": 0.2, "alive": true},
-        {"pid": 2, "team": "alpha", "color": "#22c55e", "color_name": "绿色", "weapon": "smg", "hp": 94, "x": 342, "y": 482, "vx": 12, "vy": 10, "heading": 0.6, "alive": true},
-        {"pid": 3, "team": "bravo", "color": "#f43f5e", "color_name": "红色", "weapon": "rifle", "hp": 71, "x": 674, "y": 616, "vx": -20, "vy": -8, "heading": 3.5, "alive": true},
-        {"pid": 4, "team": "bravo", "color": "#f59e0b", "color_name": "橙色", "weapon": "awp", "hp": 87, "x": 715, "y": 624, "vx": -18, "vy": 12, "heading": 2.6, "alive": true}
+        {"pid": 1, "team": "alpha", "color": "#3b82f6", "color_name": "蓝色", "weapon": "rifle", "hp": 84, "x": 420, "y": 470, "vx": 72, "vy": -20, "heading": -0.27, "alive": true},
+        {"pid": 2, "team": "alpha", "color": "#22c55e", "color_name": "绿色", "weapon": "smg", "hp": 100, "x": 455, "y": 540, "vx": 60, "vy": -28, "heading": -0.44, "alive": true},
+        {"pid": 3, "team": "alpha", "color": "#a855f7", "color_name": "紫色", "weapon": "awp", "hp": 100, "x": 425, "y": 365, "vx": 72, "vy": -40, "heading": -0.51, "alive": true},
+        {"pid": 4, "team": "alpha", "color": "#f59e0b", "color_name": "橙色", "weapon": "rifle", "hp": 100, "x": 530, "y": 645, "vx": 70, "vy": -22, "heading": -0.3, "alive": true},
+        {"pid": 5, "team": "bravo", "color": "#f43f5e", "color_name": "红色", "weapon": "rifle", "hp": 96, "x": 565, "y": 455, "vx": -74, "vy": 12, "heading": 2.98, "alive": true},
+        {"pid": 6, "team": "bravo", "color": "#06b6d4", "color_name": "青色", "weapon": "smg", "hp": 91, "x": 600, "y": 565, "vx": -70, "vy": 0, "heading": 3.14, "alive": true},
+        {"pid": 7, "team": "bravo", "color": "#ef4444", "color_name": "玫红", "weapon": "awp", "hp": 100, "x": 570, "y": 455, "vx": -62, "vy": -42, "heading": -2.54, "alive": true},
+        {"pid": 8, "team": "bravo", "color": "#84cc16", "color_name": "黄绿", "weapon": "rifle", "hp": 100, "x": 545, "y": 385, "vx": -68, "vy": 15, "heading": 2.92, "alive": true}
       ]
     },
     {
       "sequence": 4,
       "players": [
-        {"pid": 1, "team": "alpha", "color": "#3b82f6", "color_name": "蓝色", "weapon": "rifle", "hp": 0, "x": 318, "y": 438, "vx": 0, "vy": 0, "heading": 0.2, "alive": false},
-        {"pid": 2, "team": "alpha", "color": "#22c55e", "color_name": "绿色", "weapon": "smg", "hp": 94, "x": 360, "y": 496, "vx": 12, "vy": 10, "heading": 0.6, "alive": true},
-        {"pid": 3, "team": "bravo", "color": "#f43f5e", "color_name": "红色", "weapon": "rifle", "hp": 71, "x": 648, "y": 604, "vx": -20, "vy": -8, "heading": 3.5, "alive": true},
-        {"pid": 4, "team": "bravo", "color": "#f59e0b", "color_name": "橙色", "weapon": "awp", "hp": 87, "x": 692, "y": 636, "vx": -18, "vy": 12, "heading": 2.6, "alive": true}
+        {"pid": 1, "team": "alpha", "color": "#3b82f6", "color_name": "蓝色", "weapon": "rifle", "hp": 84, "x": 560, "y": 410, "vx": 65, "vy": 18, "heading": 0.27, "alive": true},
+        {"pid": 2, "team": "alpha", "color": "#22c55e", "color_name": "绿色", "weapon": "smg", "hp": 82, "x": 575, "y": 500, "vx": 58, "vy": 14, "heading": 0.24, "alive": true},
+        {"pid": 3, "team": "alpha", "color": "#a855f7", "color_name": "紫色", "weapon": "awp", "hp": 100, "x": 565, "y": 315, "vx": 70, "vy": -10, "heading": -0.14, "alive": true},
+        {"pid": 4, "team": "alpha", "color": "#f59e0b", "color_name": "橙色", "weapon": "rifle", "hp": 100, "x": 640, "y": 640, "vx": 55, "vy": 25, "heading": 0.43, "alive": true},
+        {"pid": 5, "team": "bravo", "color": "#f43f5e", "color_name": "红色", "weapon": "rifle", "hp": 74, "x": 455, "y": 500, "vx": -35, "vy": 45, "heading": 2.23, "alive": true},
+        {"pid": 6, "team": "bravo", "color": "#06b6d4", "color_name": "青色", "weapon": "smg", "hp": 91, "x": 485, "y": 590, "vx": -42, "vy": 35, "heading": 2.45, "alive": true},
+        {"pid": 7, "team": "bravo", "color": "#ef4444", "color_name": "玫红", "weapon": "awp", "hp": 100, "x": 455, "y": 405, "vx": -45, "vy": -18, "heading": -2.76, "alive": true},
+        {"pid": 8, "team": "bravo", "color": "#84cc16", "color_name": "黄绿", "weapon": "rifle", "hp": 100, "x": 420, "y": 430, "vx": -55, "vy": 34, "heading": 2.59, "alive": true}
+      ]
+    },
+    {
+      "sequence": 5,
+      "players": [
+        {"pid": 1, "team": "alpha", "color": "#3b82f6", "color_name": "蓝色", "weapon": "rifle", "hp": 84, "x": 705, "y": 545, "vx": 60, "vy": 62, "heading": 0.8, "alive": true},
+        {"pid": 2, "team": "alpha", "color": "#22c55e", "color_name": "绿色", "weapon": "smg", "hp": 82, "x": 700, "y": 620, "vx": 55, "vy": 58, "heading": 0.81, "alive": true},
+        {"pid": 3, "team": "alpha", "color": "#a855f7", "color_name": "紫色", "weapon": "awp", "hp": 100, "x": 700, "y": 410, "vx": 60, "vy": 32, "heading": 0.49, "alive": true},
+        {"pid": 4, "team": "alpha", "color": "#f59e0b", "color_name": "橙色", "weapon": "rifle", "hp": 88, "x": 755, "y": 725, "vx": 45, "vy": 50, "heading": 0.84, "alive": true},
+        {"pid": 5, "team": "bravo", "color": "#f43f5e", "color_name": "红色", "weapon": "rifle", "hp": 74, "x": 360, "y": 610, "vx": -35, "vy": 55, "heading": 2.14, "alive": true},
+        {"pid": 6, "team": "bravo", "color": "#06b6d4", "color_name": "青色", "weapon": "smg", "hp": 76, "x": 405, "y": 700, "vx": -30, "vy": 62, "heading": 2.02, "alive": true},
+        {"pid": 7, "team": "bravo", "color": "#ef4444", "color_name": "玫红", "weapon": "awp", "hp": 100, "x": 320, "y": 460, "vx": -58, "vy": 24, "heading": 2.75, "alive": true},
+        {"pid": 8, "team": "bravo", "color": "#84cc16", "color_name": "黄绿", "weapon": "rifle", "hp": 100, "x": 295, "y": 520, "vx": -52, "vy": 40, "heading": 2.49, "alive": true}
+      ]
+    },
+    {
+      "sequence": 6,
+      "players": [
+        {"pid": 1, "team": "alpha", "color": "#3b82f6", "color_name": "蓝色", "weapon": "rifle", "hp": 100, "x": 760, "y": 690, "vx": -15, "vy": 70, "heading": 1.78, "alive": true},
+        {"pid": 2, "team": "alpha", "color": "#22c55e", "color_name": "绿色", "weapon": "smg", "hp": 82, "x": 745, "y": 765, "vx": -25, "vy": 65, "heading": 1.94, "alive": true},
+        {"pid": 3, "team": "alpha", "color": "#a855f7", "color_name": "紫色", "weapon": "awp", "hp": 100, "x": 785, "y": 505, "vx": 20, "vy": 58, "heading": 1.24, "alive": true},
+        {"pid": 4, "team": "alpha", "color": "#f59e0b", "color_name": "橙色", "weapon": "rifle", "hp": 88, "x": 805, "y": 820, "vx": -18, "vy": 64, "heading": 1.84, "alive": true},
+        {"pid": 5, "team": "bravo", "color": "#f43f5e", "color_name": "红色", "weapon": "rifle", "hp": 100, "x": 300, "y": 720, "vx": -10, "vy": 65, "heading": 1.72, "alive": true},
+        {"pid": 6, "team": "bravo", "color": "#06b6d4", "color_name": "青色", "weapon": "smg", "hp": 76, "x": 335, "y": 805, "vx": -20, "vy": 60, "heading": 1.89, "alive": true},
+        {"pid": 7, "team": "bravo", "color": "#ef4444", "color_name": "玫红", "weapon": "awp", "hp": 100, "x": 205, "y": 520, "vx": -38, "vy": 15, "heading": 2.77, "alive": true},
+        {"pid": 8, "team": "bravo", "color": "#84cc16", "color_name": "黄绿", "weapon": "rifle", "hp": 100, "x": 205, "y": 610, "vx": -32, "vy": 40, "heading": 2.25, "alive": true}
+      ]
+    },
+    {
+      "sequence": 7,
+      "players": [
+        {"pid": 1, "team": "alpha", "color": "#3b82f6", "color_name": "蓝色", "weapon": "rifle", "hp": 100, "x": 580, "y": 805, "vx": -70, "vy": 20, "heading": 2.86, "alive": true},
+        {"pid": 2, "team": "alpha", "color": "#22c55e", "color_name": "绿色", "weapon": "smg", "hp": 100, "x": 620, "y": 855, "vx": -64, "vy": 10, "heading": 2.99, "alive": true},
+        {"pid": 3, "team": "alpha", "color": "#a855f7", "color_name": "紫色", "weapon": "awp", "hp": 100, "x": 675, "y": 640, "vx": -54, "vy": 34, "heading": 2.58, "alive": true},
+        {"pid": 4, "team": "alpha", "color": "#f59e0b", "color_name": "橙色", "weapon": "rifle", "hp": 88, "x": 660, "y": 865, "vx": -72, "vy": 0, "heading": 3.14, "alive": true},
+        {"pid": 5, "team": "bravo", "color": "#f43f5e", "color_name": "红色", "weapon": "rifle", "hp": 100, "x": 210, "y": 585, "vx": 5, "vy": -65, "heading": -1.49, "alive": true},
+        {"pid": 6, "team": "bravo", "color": "#06b6d4", "color_name": "青色", "weapon": "smg", "hp": 100, "x": 260, "y": 680, "vx": 12, "vy": -60, "heading": -1.37, "alive": true},
+        {"pid": 7, "team": "bravo", "color": "#ef4444", "color_name": "玫红", "weapon": "awp", "hp": 100, "x": 165, "y": 385, "vx": 10, "vy": -55, "heading": -1.39, "alive": true},
+        {"pid": 8, "team": "bravo", "color": "#84cc16", "color_name": "黄绿", "weapon": "rifle", "hp": 100, "x": 175, "y": 450, "vx": 12, "vy": -50, "heading": -1.34, "alive": true}
+      ]
+    },
+    {
+      "sequence": 8,
+      "players": [
+        {"pid": 1, "team": "alpha", "color": "#3b82f6", "color_name": "蓝色", "weapon": "rifle", "hp": 100, "x": 360, "y": 760, "vx": -62, "vy": -18, "heading": -2.86, "alive": true},
+        {"pid": 2, "team": "alpha", "color": "#22c55e", "color_name": "绿色", "weapon": "smg", "hp": 100, "x": 430, "y": 800, "vx": -55, "vy": -24, "heading": -2.73, "alive": true},
+        {"pid": 3, "team": "alpha", "color": "#a855f7", "color_name": "紫色", "weapon": "awp", "hp": 100, "x": 505, "y": 670, "vx": -65, "vy": -10, "heading": -2.99, "alive": true},
+        {"pid": 4, "team": "alpha", "color": "#f59e0b", "color_name": "橙色", "weapon": "rifle", "hp": 100, "x": 470, "y": 820, "vx": -52, "vy": -22, "heading": -2.74, "alive": true},
+        {"pid": 5, "team": "bravo", "color": "#f43f5e", "color_name": "红色", "weapon": "rifle", "hp": 100, "x": 305, "y": 425, "vx": 52, "vy": -50, "heading": -0.77, "alive": true},
+        {"pid": 6, "team": "bravo", "color": "#06b6d4", "color_name": "青色", "weapon": "smg", "hp": 100, "x": 365, "y": 500, "vx": 55, "vy": -36, "heading": -0.58, "alive": true},
+        {"pid": 7, "team": "bravo", "color": "#ef4444", "color_name": "玫红", "weapon": "awp", "hp": 100, "x": 250, "y": 305, "vx": 48, "vy": -20, "heading": -0.39, "alive": true},
+        {"pid": 8, "team": "bravo", "color": "#84cc16", "color_name": "黄绿", "weapon": "rifle", "hp": 100, "x": 275, "y": 365, "vx": 50, "vy": -22, "heading": -0.41, "alive": true}
       ]
     }
   ]

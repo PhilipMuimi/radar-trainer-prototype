@@ -55,7 +55,7 @@ python3 stream_authorized_telemetry.py --token change-this-long-secret --loop
 For more visible motion during a client demo:
 
 ```bash
-python3 stream_authorized_telemetry.py --token change-this-long-secret --loop --hz 20 --steps 12
+python3 stream_authorized_telemetry.py --token change-this-long-secret --loop --hz 20 --steps 10
 ```
 
 Keep this command running while the browser is open. If it stops, the page will show `过期 / Stale` after the telemetry TTL expires.

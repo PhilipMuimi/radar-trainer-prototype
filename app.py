@@ -730,7 +730,7 @@ HTML = """<!doctype html>
   <main class="phone">
     <header class="topbar">
       <div class="clock" id="clock">00:00</div>
-      <div class="system-pill"><span></span><strong>已连接</strong></div>
+      <div class="system-pill"><span></span><strong id="connectionStatus">已连接</strong></div>
       <div class="battery">27</div>
     </header>
 
@@ -1564,6 +1564,7 @@ const readout = document.getElementById('readout');
 const eventLog = document.getElementById('eventLog');
 const reset = document.getElementById('reset');
 const clock = document.getElementById('clock');
+const connectionStatus = document.getElementById('connectionStatus');
 const alphaScore = document.getElementById('alphaScore');
 const bravoScore = document.getElementById('bravoScore');
 const roundLabel = document.getElementById('roundLabel');
@@ -1715,6 +1716,15 @@ function updateReadout() {
 function updateHud() {
   if (!state?.game) return;
   const game = state.game;
+  const telemetry = state.telemetry || {};
+  const statusText = state.source === 'external'
+    ? `实时 #${telemetry.sequence || 0} / Live`
+    : state.source === 'stale'
+      ? `过期 #${telemetry.sequence || 0} / Stale`
+      : state.source === 'waiting'
+        ? '等待数据 / Waiting'
+        : '演示 / Demo';
+  connectionStatus.textContent = statusText;
   alphaScore.textContent = game.score.alpha;
   bravoScore.textContent = game.score.bravo;
   roundLabel.textContent = `第${game.round}回合 / R${game.round}`;

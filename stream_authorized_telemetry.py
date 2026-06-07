@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+"""Replay authorized telemetry frames into the radar backend."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import time
+from pathlib import Path
+from urllib import request
+
+
+def post_frame(url: str, token: str, payload: dict) -> str:
+    body = json.dumps(payload).encode("utf-8")
+    headers = {"Content-Type": "application/json"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    req = request.Request(url, data=body, headers=headers, method="POST")
+    with request.urlopen(req, timeout=5) as response:
+        return response.read().decode("utf-8")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Stream recorded authorized telemetry frames.")
+    parser.add_argument("--file", default="authorized_telemetry_replay.json")
+    parser.add_argument("--url", default="http://127.0.0.1:8000/api/telemetry")
+    parser.add_argument("--token", default="")
+    parser.add_argument("--hz", default=4, type=float)
+    parser.add_argument("--loop", action="store_true")
+    args = parser.parse_args()
+
+    replay = json.loads(Path(args.file).read_text(encoding="utf-8"))
+    frames = replay.get("frames", [])
+    if not frames:
+        raise SystemExit("replay file must contain frames")
+
+    interval = 1 / max(args.hz, 0.1)
+    while True:
+        for frame in frames:
+            payload = {
+                "mode": replay.get("mode", "authorized"),
+                "map": replay.get("map", "training"),
+                "sequence": frame.get("sequence"),
+                "players": frame["players"],
+            }
+            print(post_frame(args.url, args.token, payload))
+            time.sleep(interval)
+        if not args.loop:
+            break
+
+
+if __name__ == "__main__":
+    main()

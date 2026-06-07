@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
-"""Authorized radar training dashboard.
+"""Authorized radar telemetry dashboard.
 
-This app deliberately uses simulated telemetry. It does not read game memory,
-inject code, disguise processes, or interact with anti-cheat systems.
+The production mode accepts authorized telemetry over HTTP. It does not read
+game memory, inject code, disguise processes, or interact with anti-cheat
+systems.
 """
 
 from __future__ import annotations
 
 import argparse
+import hmac
 import json
 import math
+import os
 import random
 import threading
 import time
@@ -25,6 +28,10 @@ TICK_SECONDS = 1 / 144
 MAX_STREAM_HZ = 144
 MIN_STREAM_SECONDS = 1 / MAX_STREAM_HZ
 MAX_POST_BYTES = 64_000
+MAX_PLAYERS = 20
+EXTERNAL_TTL_SECONDS = float(os.environ.get("RADAR_EXTERNAL_TTL", "5"))
+TELEMETRY_TOKEN = os.environ.get("RADAR_TELEMETRY_TOKEN", "").strip()
+REQUIRE_TELEMETRY = os.environ.get("RADAR_REQUIRE_TELEMETRY", "").strip().lower() in {"1", "true", "yes", "on"}
 COLORS = ["#f43f5e", "#22c55e", "#3b82f6", "#f59e0b", "#a855f7"]
 REGIONS = {
     "shanghai": {"name": "Shanghai", "latency": 18},
@@ -77,6 +84,8 @@ class MatchState:
         self.map_confidence = 1.0
         self.map_detection = "default"
         self.external_until = 0.0
+        self.last_telemetry_at = 0.0
+        self.telemetry_sequence = 0
         self.tick = 0
         self.difficulty = "normal"
         self.score = {"alpha": 0, "bravo": 0}
@@ -94,7 +103,12 @@ class MatchState:
         self.controlled_pid = 0
         self.input_x = 0.0
         self.input_y = 0.0
-        self._start_round(reset_score=True)
+        if REQUIRE_TELEMETRY:
+            self.started_at = time.time()
+            self.source = "waiting"
+            self.events = ["等待授权实时数据 / Waiting for authorized live telemetry"]
+        else:
+            self._start_round(reset_score=True)
 
     def _start_round(self, reset_score: bool = False) -> None:
         if reset_score:
@@ -157,7 +171,7 @@ class MatchState:
             if self.source == "external":
                 self.source = "stale"
                 return
-            if self.source == "stale":
+            if self.source in {"stale", "waiting"}:
                 return
             if self.phase != "live":
                 if time.time() - self.phase_changed_at > 4.0:
@@ -342,9 +356,13 @@ class MatchState:
         raw_players = payload.get("players")
         if not isinstance(raw_players, list):
             raise ValueError("payload must contain a players list")
+        if len(raw_players) > MAX_PLAYERS:
+            raise ValueError(f"players list cannot exceed {MAX_PLAYERS}")
 
         players = [self._player_from_payload(index, raw) for index, raw in enumerate(raw_players)]
         map_id, confidence, detection = self._identify_map(payload, players)
+        sequence = int(payload.get("sequence", self.telemetry_sequence + 1))
+        now = time.time()
         with self.lock:
             self.players = players
             self.mode = str(payload.get("mode", "external"))
@@ -352,9 +370,19 @@ class MatchState:
             self.map_confidence = confidence
             self.map_detection = detection
             self.source = "external"
-            self.external_until = time.time() + 5.0
+            self.external_until = now + EXTERNAL_TTL_SECONDS
+            self.last_telemetry_at = now
+            self.telemetry_sequence = sequence
             self.tick += 1
-        return {"ok": True, "players": len(players), "source": "external"}
+            self._push_event(f"收到授权实时数据 / Authorized telemetry received #{sequence}")
+        return {
+            "ok": True,
+            "players": len(players),
+            "source": "external",
+            "sequence": sequence,
+            "map": map_id,
+            "ttl_seconds": EXTERNAL_TTL_SECONDS,
+        }
 
     def _identify_map(self, payload: dict, players: list[Player]) -> tuple[str, float, str]:
         explicit = payload.get("map") or payload.get("map_id") or payload.get("level")
@@ -403,14 +431,19 @@ class MatchState:
         if not isinstance(raw, dict):
             raise ValueError("each player must be an object")
 
-        team = str(raw.get("team", "alpha" if index < 5 else "bravo"))
+        team = str(raw.get("team", "alpha" if index < 5 else "bravo")).lower()
+        if team not in {"alpha", "bravo"}:
+            raise ValueError("player team must be alpha or bravo")
         color = str(raw.get("color", COLORS[index % len(COLORS)]))
         color_name = str(raw.get("color_name", ["红色", "绿色", "蓝色", "橙色", "紫色"][index % 5]))
         heading = float(raw.get("heading", 0.0))
         vx = float(raw.get("vx", 0.0))
         vy = float(raw.get("vy", 0.0))
+        pid = int(raw.get("pid", index + 1))
+        if pid < 1:
+            raise ValueError("player pid must be positive")
         return Player(
-            pid=int(raw.get("pid", index + 1)),
+            pid=pid,
             team=team,
             color=color,
             color_name=color_name,
@@ -445,6 +478,14 @@ class MatchState:
                     "name": relay["name"],
                     "latency": relay["latency"] + random.randint(-4, 7),
                 },
+                "telemetry": {
+                    "required_live": REQUIRE_TELEMETRY,
+                    "required_token": bool(TELEMETRY_TOKEN),
+                    "last_received_at": self.last_telemetry_at,
+                    "age_seconds": round(time.time() - self.last_telemetry_at, 3) if self.last_telemetry_at else None,
+                    "sequence": self.telemetry_sequence,
+                    "ttl_seconds": EXTERNAL_TTL_SECONDS,
+                },
                 "players": [asdict(player) for player in self.players],
             }
 
@@ -473,15 +514,61 @@ class MatchState:
     def reset(self) -> None:
         with self.lock:
             self.started_at = time.time()
-            self.players = self._spawn_players()
-            self.mode = "scrim"
-            self.source = "simulation"
+            self.players = []
+            self.mode = "authorized" if REQUIRE_TELEMETRY else "scrim"
+            self.source = "waiting" if REQUIRE_TELEMETRY else "simulation"
             self.map_id = "training"
             self.map_confidence = 1.0
             self.map_detection = "default"
             self.external_until = 0.0
-            self._start_round(reset_score=True)
+            self.last_telemetry_at = 0.0
+            self.telemetry_sequence = 0
+            if REQUIRE_TELEMETRY:
+                self.score = {"alpha": 0, "bravo": 0}
+                self.round_number = 0
+                self.phase = "live"
+                self.events = ["等待授权实时数据 / Waiting for authorized live telemetry"]
+            else:
+                self._start_round(reset_score=True)
             self.tick = 0
+
+
+def telemetry_schema() -> dict:
+    return {
+        "name": "authorized-radar-telemetry",
+        "description": "授权数据源上传的实时雷达数据 / Real-time radar data from an authorized source",
+        "required_headers": {
+            "Authorization": "Bearer <RADAR_TELEMETRY_TOKEN>",
+            "Content-Type": "application/json",
+        },
+        "payload": {
+            "mode": "authorized",
+            "map": "training|compact|long or an alias such as de_mirage",
+            "sequence": 1,
+            "players": [
+                {
+                    "pid": 1,
+                    "team": "alpha|bravo",
+                    "color": "#3b82f6",
+                    "color_name": "蓝色",
+                    "weapon": "rifle",
+                    "hp": 100,
+                    "x": 260,
+                    "y": 420,
+                    "vx": 0,
+                    "vy": 0,
+                    "heading": 0.0,
+                    "alive": True,
+                }
+            ],
+        },
+        "limits": {
+            "max_players": MAX_PLAYERS,
+            "coordinate_space": f"0..{MAP_SIZE}",
+            "max_body_bytes": MAX_POST_BYTES,
+            "external_ttl_seconds": EXTERNAL_TTL_SECONDS,
+        },
+    }
 
 
 STATE = MatchState()
@@ -499,6 +586,11 @@ class RadarHandler(BaseHTTPRequestHandler):
     css: ClassVar[str] = ""
     js: ClassVar[str] = ""
 
+    def do_OPTIONS(self) -> None:
+        self.send_response(HTTPStatus.NO_CONTENT)
+        self._send_common_headers("text/plain; charset=utf-8", 0)
+        self.end_headers()
+
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
         if parsed.path == "/":
@@ -512,6 +604,10 @@ class RadarHandler(BaseHTTPRequestHandler):
         elif parsed.path == "/api/state":
             region = parse_qs(parsed.query).get("region", ["shanghai"])[0]
             self._send_json(STATE.snapshot(region))
+        elif parsed.path == "/api/health":
+            self._send_json(self._health())
+        elif parsed.path == "/api/telemetry/schema":
+            self._send_json(telemetry_schema())
         elif parsed.path == "/events":
             self._events(parsed)
         else:
@@ -530,8 +626,11 @@ class RadarHandler(BaseHTTPRequestHandler):
                 self._send(HTTPStatus.BAD_REQUEST, str(exc), "text/plain; charset=utf-8")
         elif parsed.path == "/api/telemetry":
             try:
+                self._require_telemetry_auth()
                 payload = self._read_json_body()
                 self._send_json(STATE.ingest(payload))
+            except PermissionError as exc:
+                self._send(HTTPStatus.UNAUTHORIZED, str(exc), "text/plain; charset=utf-8")
             except ValueError as exc:
                 self._send(HTTPStatus.BAD_REQUEST, str(exc), "text/plain; charset=utf-8")
         else:
@@ -545,14 +644,41 @@ class RadarHandler(BaseHTTPRequestHandler):
     def _send(self, status: HTTPStatus, body: str, content_type: str) -> None:
         encoded = body.encode("utf-8")
         self.send_response(status)
-        self.send_header("Content-Type", content_type)
-        self.send_header("Content-Length", str(len(encoded)))
-        self.send_header("Cache-Control", "no-store")
+        self._send_common_headers(content_type, len(encoded))
         self.end_headers()
         self.wfile.write(encoded)
 
+    def _send_common_headers(self, content_type: str, length: int) -> None:
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(length))
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Access-Control-Allow-Origin", os.environ.get("RADAR_ALLOWED_ORIGIN", "*"))
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Radar-Token")
+
     def _send_json(self, payload: dict) -> None:
         self._send(HTTPStatus.OK, json.dumps(payload), "application/json; charset=utf-8")
+
+    def _require_telemetry_auth(self) -> None:
+        if not TELEMETRY_TOKEN:
+            return
+        authorization = self.headers.get("Authorization", "")
+        bearer = authorization.removeprefix("Bearer ").strip() if authorization.startswith("Bearer ") else ""
+        header_token = self.headers.get("X-Radar-Token", "").strip()
+        if hmac.compare_digest(bearer, TELEMETRY_TOKEN) or hmac.compare_digest(header_token, TELEMETRY_TOKEN):
+            return
+        raise PermissionError("missing or invalid telemetry token")
+
+    def _health(self) -> dict:
+        snapshot = STATE.snapshot("shanghai")
+        return {
+            "ok": True,
+            "service": "authorized-radar",
+            "source": snapshot["source"],
+            "map": snapshot["map"],
+            "players": len(snapshot["players"]),
+            "telemetry": snapshot["telemetry"],
+        }
 
     def _read_json_body(self) -> dict:
         length = int(self.headers.get("Content-Length", "0"))

@@ -1,6 +1,7 @@
 {
   "mode": "authorized",
   "map": "compact",
+  "sequence": 1,
   "players": [
     {
       "pid": 1,

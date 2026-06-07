@@ -52,6 +52,12 @@ Stream a recorded authorized replay:
 python3 stream_authorized_telemetry.py --token change-this-long-secret --loop
 ```
 
+For more visible motion during a client demo:
+
+```bash
+python3 stream_authorized_telemetry.py --token change-this-long-secret --loop --hz 20 --steps 12
+```
+
 Health check:
 
 ```bash

@@ -55,6 +55,12 @@ In another terminal:
 python3 stream_authorized_telemetry.py --token test-secret --loop
 ```
 
+For smoother visible movement:
+
+```bash
+python3 stream_authorized_telemetry.py --token test-secret --loop --hz 20 --steps 12
+```
+
 Open:
 
 ```text

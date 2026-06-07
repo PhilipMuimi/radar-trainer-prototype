@@ -58,7 +58,7 @@ python3 stream_authorized_telemetry.py --token test-secret --loop
 For smoother visible movement:
 
 ```bash
-python3 stream_authorized_telemetry.py --token test-secret --loop --hz 20 --steps 10
+python3 stream_authorized_telemetry.py --token test-secret --random --hz 20 --players 8
 ```
 
 Keep the streamer running during the demo. If it is stopped, the radar keeps the last frame and marks the feed as `过期 / Stale`.

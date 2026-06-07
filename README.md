@@ -52,10 +52,10 @@ Stream a recorded authorized replay:
 python3 stream_authorized_telemetry.py --token change-this-long-secret --loop
 ```
 
-For more visible motion during a client demo:
+For random non-colliding live movement during a client demo:
 
 ```bash
-python3 stream_authorized_telemetry.py --token change-this-long-secret --loop --hz 20 --steps 10
+python3 stream_authorized_telemetry.py --token change-this-long-secret --random --hz 20 --players 8
 ```
 
 Keep this command running while the browser is open. If it stops, the page will show `过期 / Stale` after the telemetry TTL expires.

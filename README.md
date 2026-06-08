@@ -1,6 +1,6 @@
-# 战术雷达训练器 / Tactical Radar Trainer
+# CS2 授权战术雷达 / CS2 Authorized Tactical Radar
 
-授权实时数据雷达后台和移动端查看器 / Authorized real-time radar backend and mobile viewer.
+面向 CS2 训练、回放、观战工作流的授权实时数据雷达后台和移动端查看器 / Authorized real-time radar backend and mobile viewer for CS2 training, replay, and spectator workflows.
 
 Live demo:
 
@@ -10,6 +10,7 @@ https://radar-trainer-prototype.vercel.app
 
 - 中文优先界面，附英文翻译 / Chinese-first UI with English translations
 - Browser/mobile radar viewer
+- CS2-themed viewer and OBS/browser overlay mode
 - Token-protected authorized telemetry ingest API
 - Real-time Server-Sent Events stream
 - Health and telemetry schema endpoints
@@ -84,6 +85,12 @@ Then open:
 http://127.0.0.1:8000
 ```
 
+CS2 overlay/OBS mode:
+
+```text
+http://127.0.0.1:8000/?overlay=1
+```
+
 ## Vercel Version
 
 The Vercel deployment uses the static browser prototype in:
@@ -100,6 +107,6 @@ Redeploy:
 
 ## Note
 
-This is a legal authorized telemetry product. It does not bypass anti-cheat, hide processes, or extract protected live-game coordinates. Real data must come from a source you are allowed to instrument, export, parse, or operate.
+This is a legal authorized CS2 telemetry product. It does not bypass anti-cheat, hide processes, or extract protected live-game coordinates. Real data must come from a source you are allowed to instrument, export, parse, or operate.
 
 See `CLIENT_HANDOFF.md` for the explanation to give the client.

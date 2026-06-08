@@ -723,7 +723,7 @@ HTML = """<!doctype html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>战术雷达训练器 / Tactical Radar Trainer</title>
+  <title>CS2 授权战术雷达 / CS2 Authorized Tactical Radar</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -733,6 +733,11 @@ HTML = """<!doctype html>
       <div class="system-pill"><span></span><strong id="connectionStatus">已连接</strong></div>
       <div class="battery">27</div>
     </header>
+
+    <div class="mode-badge">
+      <strong>CS2 授权雷达</strong>
+      <span>训练 / 回放 / 观战</span>
+    </div>
 
     <div class="actions">
       <button id="serverButton" class="icon-button" type="button" aria-label="雷达服务器">▤</button>
@@ -806,9 +811,9 @@ HTML = """<!doctype html>
           <span>地图:</span>
           <select id="mapChoice">
             <option value="auto" selected>自动识别</option>
-            <option value="training">训练图</option>
-            <option value="compact">紧凑图</option>
-            <option value="long">长廊图</option>
+            <option value="training">Mirage 训练 / Mirage Training</option>
+            <option value="compact">Inferno 训练 / Inferno Training</option>
+            <option value="long">Dust2 训练 / Dust2 Training</option>
           </select>
         </label>
 
@@ -847,7 +852,7 @@ HTML = """<!doctype html>
           <label>观战列表 <input id="showList" type="checkbox" checked></label>
         </div>
 
-        <p class="warning">请使用授权数据源或训练数据打开，否则无效。</p>
+        <p class="warning">仅支持授权训练、回放或观战数据源。</p>
       </div>
     </div>
 
@@ -906,6 +911,10 @@ body {
   overflow: hidden;
 }
 
+body.overlay-mode {
+  background: transparent;
+}
+
 .phone {
   position: relative;
   width: min(100vw, 620px);
@@ -913,6 +922,11 @@ body {
   margin: 0 auto;
   background: #282b37;
   overflow: hidden;
+}
+
+body.overlay-mode .phone {
+  width: 100vw;
+  background: transparent;
 }
 
 .topbar {
@@ -969,6 +983,30 @@ body {
   font-size: 18px;
   font-weight: 900;
   text-align: center;
+}
+
+.mode-badge {
+  position: fixed;
+  left: max(18px, calc((100vw - 620px) / 2 + 18px));
+  top: 112px;
+  z-index: 5;
+  display: grid;
+  gap: 2px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: rgba(10, 12, 18, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  pointer-events: none;
+}
+
+.mode-badge strong {
+  font-size: 14px;
+}
+
+.mode-badge span {
+  color: var(--muted);
+  font-size: 11px;
 }
 
 .actions {
@@ -1509,6 +1547,11 @@ input[type="range"] {
     gap: 12px;
   }
 
+  .mode-badge {
+    left: calc(50vw - 650px);
+    top: 124px;
+  }
+
   .radar-stage {
     position: fixed;
     inset: 0;
@@ -1553,6 +1596,26 @@ input[type="range"] {
     text-overflow: ellipsis;
   }
 }
+
+body.overlay-mode .mode-badge,
+body.overlay-mode .actions,
+body.overlay-mode .game-hud,
+body.overlay-mode .event-log,
+body.overlay-mode .readout {
+  display: none !important;
+}
+
+body.overlay-mode .topbar {
+  top: 10px;
+}
+
+body.overlay-mode .radar-stage {
+  padding: 54px 20px 20px;
+}
+
+body.overlay-mode canvas {
+  width: min(96vw, 96vh);
+}
 """
 
 
@@ -1594,6 +1657,9 @@ const zoom = document.getElementById('zoom');
 const playerSize = document.getElementById('playerSize');
 const smooth = document.getElementById('smooth');
 const mapChoice = document.getElementById('mapChoice');
+const params = new URLSearchParams(window.location.search);
+const overlayMode = params.get('overlay') === '1' || params.get('overlay') === 'true';
+document.body.classList.toggle('overlay-mode', overlayMode);
 
 let source;
 let state;

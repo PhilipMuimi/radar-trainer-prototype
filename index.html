@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>战术雷达训练器 / Tactical Radar Trainer</title>
+  <title>CS2 授权战术雷达 / CS2 Authorized Tactical Radar</title>
   <style>
     :root {
       color-scheme: dark;
@@ -77,6 +77,23 @@
       background: #18d982;
       box-shadow: 0 0 0 7px rgba(24,217,130,.16);
     }
+
+    .mode-badge {
+      position: fixed;
+      left: max(18px, calc((100vw - 620px) / 2 + 18px));
+      top: 112px;
+      z-index: 5;
+      display: grid;
+      gap: 2px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      background: rgba(10, 12, 18, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      pointer-events: none;
+    }
+
+    .mode-badge strong { font-size: 14px; }
+    .mode-badge span { color: var(--muted); font-size: 11px; }
 
     .battery {
       justify-self: end;
@@ -450,6 +467,7 @@
       <div class="pill"><i></i><strong>已连接 / Connected</strong></div>
       <div class="battery">27</div>
     </header>
+    <div class="mode-badge"><strong>CS2 授权雷达</strong><span>训练 / 回放 / 观战</span></div>
 
     <div class="actions">
       <button id="serverButton" class="icon-button" type="button" aria-label="雷达服务器">▤</button>
@@ -514,9 +532,9 @@
           <span>地图 / Map</span>
           <select id="mapChoice">
             <option value="auto" selected>自动识别 / Auto</option>
-            <option value="training">训练图 / Training</option>
-            <option value="compact">紧凑图 / Compact</option>
-            <option value="long">长廊图 / Long</option>
+            <option value="training">Mirage 训练 / Mirage Training</option>
+            <option value="compact">Inferno 训练 / Inferno Training</option>
+            <option value="long">Dust2 训练 / Dust2 Training</option>
           </select>
         </label>
         <label class="field">

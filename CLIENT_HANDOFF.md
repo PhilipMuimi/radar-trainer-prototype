@@ -2,9 +2,9 @@
 
 ## 项目状态 / Project Status
 
-本项目已经整理为“授权实时数据雷达系统”。前端负责手机、平板和桌面雷达显示；后端负责接收授权坐标数据、地图识别、状态推送和健康检查。
+本项目已经整理为“CS2 授权实时数据雷达系统”。前端负责手机、平板、桌面和 OBS 覆盖层雷达显示；后端负责接收授权坐标数据、地图识别、状态推送和健康检查。
 
-This project is now structured as an authorized real-time radar system. The frontend displays the radar on mobile, tablet, and desktop; the backend receives authorized coordinate data, identifies the map, streams state, and exposes health checks.
+This project is now structured as a CS2 authorized real-time radar system. The frontend displays the radar on mobile, tablet, desktop, and OBS/browser overlays; the backend receives authorized coordinate data, identifies the map, streams state, and exposes health checks.
 
 ## 工作方式 / How It Works
 
@@ -69,8 +69,14 @@ Open:
 http://127.0.0.1:8000
 ```
 
+OBS/browser overlay:
+
+```text
+http://127.0.0.1:8000/?overlay=1
+```
+
 ## 交付边界 / Delivery Boundary
 
-本项目不绕过反作弊、不隐藏进程、不读取受保护游戏内存、不提取未授权的实时敌方坐标。
+本项目不绕过反作弊、不隐藏进程、不读取受保护游戏内存、不提取未授权的实时敌方坐标。它适用于 CS2 授权训练、回放、观战和私有遥测流程。
 
-This project does not bypass anti-cheat, hide processes, read protected game memory, or extract unauthorized live enemy coordinates.
+This project does not bypass anti-cheat, hide processes, read protected game memory, or extract unauthorized live enemy coordinates. It is suitable for CS2 authorized training, replay, spectator, and private telemetry workflows.

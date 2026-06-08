@@ -1989,17 +1989,49 @@ function drawObjective() {
   ctx.beginPath();
   ctx.arc(cx, cy, 82, 0, Math.PI * 2);
   ctx.fill();
+
+  ctx.translate(cx, cy);
+  ctx.rotate(Math.PI / 4);
+  ctx.fillStyle = 'rgba(255, 200, 45, 0.95)';
+  ctx.strokeStyle = 'rgba(25, 20, 10, 0.78)';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.roundRect(-18, -18, 36, 36, 6);
+  ctx.fill();
+  ctx.stroke();
+  ctx.rotate(-Math.PI / 4);
+  ctx.fillStyle = '#161616';
+  ctx.font = '900 22px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('C4', 0, 1);
   ctx.restore();
 }
 
+function teamColor(player) {
+  if (!player.alive) return '#747b8d';
+  return player.team === 'alpha' ? '#58a6ff' : '#f4b63f';
+}
+
+function teamStroke(player) {
+  if (!player.alive) return 'rgba(230,235,245,0.36)';
+  return player.team === 'alpha' ? '#d7ecff' : '#fff1ba';
+}
+
+function weaponShort(weapon) {
+  const map = {rifle: 'AK', smg: 'SMG', awp: 'AWP', pistol: 'P250', knife: 'KNF'};
+  return map[weapon] || String(weapon || 'RIF').slice(0, 4).toUpperCase();
+}
+
 function drawCone(player, size) {
+  if (!player.alive) return;
   ctx.save();
   ctx.translate(player.x, player.y);
   ctx.rotate(player.heading);
-  ctx.fillStyle = player.team === 'alpha' ? 'rgba(80, 145, 255, 0.22)' : 'rgba(255, 212, 55, 0.28)';
+  ctx.fillStyle = player.team === 'alpha' ? 'rgba(70, 150, 255, 0.18)' : 'rgba(255, 188, 58, 0.2)';
   ctx.beginPath();
   ctx.moveTo(0, 0);
-  ctx.arc(0, 0, size * 6.2, -0.42, 0.42);
+  ctx.arc(0, 0, size * 5.8, -0.34, 0.34);
   ctx.closePath();
   ctx.fill();
   ctx.restore();
@@ -2008,19 +2040,101 @@ function drawCone(player, size) {
 function drawWeapon(player, size) {
   if (!showWeapons.checked) return;
   ctx.save();
-  ctx.translate(player.x - size * 2.3, player.y + size * 1.8);
-  ctx.strokeStyle = '#fff';
-  ctx.lineWidth = 5;
-  ctx.lineCap = 'round';
+  ctx.translate(player.x, player.y + size + 17);
+  ctx.font = `900 ${Math.max(12, size * 0.72)}px system-ui, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const label = weaponShort(player.weapon);
+  const width = Math.max(34, ctx.measureText(label).width + 14);
+  ctx.fillStyle = 'rgba(10, 12, 17, 0.86)';
+  ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+  ctx.lineWidth = 2;
   ctx.beginPath();
-  if (player.weapon === 'knife') {
-    ctx.moveTo(-18, 6); ctx.lineTo(18, -8);
-  } else if (player.weapon === 'awp') {
-    ctx.moveTo(-24, 0); ctx.lineTo(24, 0); ctx.moveTo(8, 0); ctx.lineTo(16, 10);
-  } else {
-    ctx.moveTo(-18, 2); ctx.lineTo(16, 2); ctx.lineTo(23, -4); ctx.moveTo(0, 2); ctx.lineTo(7, 12);
-  }
+  ctx.roundRect(-width / 2, -10, width, 20, 5);
+  ctx.fill();
   ctx.stroke();
+  ctx.fillStyle = player.team === 'alpha' ? '#d7ecff' : '#fff1ba';
+  ctx.fillText(label, 0, 1);
+  ctx.restore();
+}
+
+function drawHpChip(player, size) {
+  if (!player.alive) return;
+  ctx.save();
+  ctx.translate(player.x, player.y - size - 16);
+  const hp = Math.max(0, Math.min(100, Number(player.hp) || 0));
+  ctx.fillStyle = 'rgba(10, 12, 17, 0.86)';
+  ctx.strokeStyle = hp < 35 ? 'rgba(255,80,104,0.9)' : 'rgba(255,255,255,0.16)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.roundRect(-22, -10, 44, 20, 6);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = hp < 35 ? '#ff5d75' : '#23e35f';
+  ctx.fillRect(-17, 6, 34 * (hp / 100), 3);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 12px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(String(hp), 0, -1);
+  ctx.restore();
+}
+
+function drawCsMarker(player, size) {
+  const radius = size * 0.92;
+  ctx.save();
+  ctx.translate(player.x, player.y);
+  ctx.globalAlpha = player.alive ? 1 : 0.36;
+
+  ctx.shadowColor = 'rgba(0,0,0,0.55)';
+  ctx.shadowBlur = 7;
+  ctx.fillStyle = 'rgba(8, 10, 15, 0.86)';
+  ctx.beginPath();
+  ctx.arc(0, 0, radius + 5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  ctx.fillStyle = teamColor(player);
+  ctx.strokeStyle = teamStroke(player);
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(0, 0, radius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.rotate(player.heading);
+  ctx.fillStyle = player.alive ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.42)';
+  ctx.beginPath();
+  ctx.moveTo(radius + 9, 0);
+  ctx.lineTo(radius * 0.15, -radius * 0.42);
+  ctx.lineTo(radius * 0.15, radius * 0.42);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.rotate(-player.heading);
+  ctx.fillStyle = 'rgba(0,0,0,0.52)';
+  ctx.beginPath();
+  ctx.arc(0, 0, radius * 0.35, 0, Math.PI * 2);
+  ctx.fill();
+
+  if (String(focusPlayer.value) === String(player.pid)) {
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.arc(0, 0, radius + 11, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  if (!player.alive) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(-radius * 0.7, -radius * 0.7);
+    ctx.lineTo(radius * 0.7, radius * 0.7);
+    ctx.moveTo(radius * 0.7, -radius * 0.7);
+    ctx.lineTo(-radius * 0.7, radius * 0.7);
+    ctx.stroke();
+  }
   ctx.restore();
 }
 
@@ -2041,51 +2155,12 @@ function drawPlayers() {
       ctx.stroke();
     }
 
-    if (shape === 'cone') drawCone(player, size);
-    if (player.alive) drawWeapon(player, size);
-
-    ctx.save();
-    ctx.translate(player.x, player.y);
-    ctx.rotate(player.heading);
-    ctx.globalAlpha = player.alive ? 1 : 0.32;
-    ctx.fillStyle = player.alive ? player.color : '#7c8294';
-    ctx.strokeStyle = player.alive ? 'rgba(255,255,255,0.72)' : 'rgba(255,255,255,0.28)';
-    ctx.lineWidth = 3;
-    if (shape === 'triangle') {
-      ctx.beginPath();
-      ctx.moveTo(size * 1.25, 0);
-      ctx.lineTo(-size, -size * 0.8);
-      ctx.lineTo(-size * 0.55, 0);
-      ctx.lineTo(-size, size * 0.8);
-      ctx.closePath();
-    } else if (shape === 'bar') {
-      ctx.beginPath();
-      ctx.roundRect(-size * 0.35, -size * 1.3, size * 0.7, size * 2.6, 5);
-    } else {
-      ctx.beginPath();
-      ctx.arc(0, 0, size, 0, Math.PI * 2);
+    drawCone(player, size);
+    drawCsMarker(player, size);
+    if (player.alive) {
+      drawHpChip(player, size);
+      drawWeapon(player, size);
     }
-    ctx.fill();
-    ctx.stroke();
-    if (player.controlled) {
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 5;
-      ctx.beginPath();
-      ctx.arc(0, 0, size + 9, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-    if (!player.alive) {
-      ctx.rotate(-player.heading);
-      ctx.strokeStyle = 'rgba(255,255,255,0.75)';
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.moveTo(-size * 0.72, -size * 0.72);
-      ctx.lineTo(size * 0.72, size * 0.72);
-      ctx.moveTo(size * 0.72, -size * 0.72);
-      ctx.lineTo(-size * 0.72, size * 0.72);
-      ctx.stroke();
-    }
-    ctx.restore();
   }
   ctx.restore();
 }
@@ -2103,10 +2178,8 @@ function drawLabels() {
   for (const player of renderPlayers()) {
     if (!player.alive || (!showFriends.checked && player.team === 'alpha')) continue;
     const team = player.team === 'alpha' ? 'CT' : 'T';
-    ctx.fillStyle = '#fff';
-    ctx.fillText(`${team} ${player.color_name}`, player.x + size + 10, player.y + 2);
-    ctx.fillStyle = '#21e037';
-    ctx.fillText(`HP:[${player.hp}]`, player.x + size + 118, player.y + 2);
+    ctx.fillStyle = player.team === 'alpha' ? '#d7ecff' : '#fff1ba';
+    ctx.fillText(`${team} ${player.color_name}`, player.x + size + 12, player.y + 2);
   }
   ctx.restore();
 }
